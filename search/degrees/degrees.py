@@ -92,8 +92,56 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
 
-    # TODO
-    raise NotImplementedError
+    # initialize Frontier
+    start = Node(state=source, parent=None, action=None)
+    frontier = StackFrontier()
+    frontier.add(start)
+
+    # initialize passed nodes
+    actors_explored = set()
+
+    while True:
+        
+        # if the frontier is empty, there is no solution
+        if (frontier.empty()):
+            return None
+        
+        # get a node from the frontier
+        node = frontier.remove()
+
+        # if that node is the target, we found our solution
+        if (node.state == target):
+            actions = []
+            cells = []
+
+            # backtrack to return the solution
+            while node.parent is not None:
+                actions.append(node.action)
+                cells.append(node.state)
+                node = node.parent
+
+            actions.reverse()
+            cells.reverse()
+
+            result = list()
+            for action, cell in zip(actions, cells):
+                result.append((action, cell))
+
+            return result
+
+        # mark node as explored
+        actors_explored.add(node.state)
+
+        # add neighbors
+        neighbors = neighbors_for_person(node.state)
+
+        for neighbor in neighbors:
+            action = neighbor[0]
+            state = neighbor[1]
+
+            if (not frontier.contains_state(state)) and state not in actors_explored:
+                child = Node(state=state, parent=node, action=action)
+                frontier.add(child)
 
 
 def person_id_for_name(name):
