@@ -125,49 +125,34 @@ def sample_pagerank(corpus, damping_factor, n):
 
 
 def iterate_pagerank(corpus, damping_factor):
-    """
-    Return PageRank values for each page by iteratively updating
-    PageRank values until convergence.
+    threshold=0.001
+    N = len(corpus)
+    page_rank = {page: 1 / N for page in corpus}
 
-    Return a dictionary where keys are page names, and values are
-    their estimated PageRank value (a value between 0 and 1). All
-    PageRank values should sum to 1.
-    """
-
-    raise NotImplementedError
-
-    # start PR dictionary with the keys, and assign each page a rank of 1 / N
-    page_rank = dict()
-    old_page_rank = dict()
-
-    for key in corpus:
-        page_rank[key] = 1/len(corpus.keys())
+    for page in corpus:
+        if not corpus[page]: 
+            corpus[page] = set(corpus.keys())
 
     while True:
+        new_rank = {}
+        for page in corpus:
+            rank = (1 - damping_factor) / N
 
-        # set flag to 0
-        break_loop = 0
-        # old dict to compare the 0.001 difference
-        for key, value in page_rank.items():
-            old_page_rank[key] = value
+            for other_page in corpus:
+                if page in corpus[other_page]:
+                    rank += damping_factor * page_rank[other_page] / len(corpus[other_page])
 
-        # get transition model of current page
-        #transition_mod = transition_model(corpus, random_key, damping_factor)
+            new_rank[page] = rank
 
-
-
-
-        # check if there is a change smaller then 0.001 in all page ranks
-        for key, value in page_rank.items():
-            if -0.001 < old_page_rank[key] - value < 0.001:
-                break_loop +=1
-
-        if break_loop == (page_rank.keys()):
+        if all(abs(new_rank[page] - page_rank[page]) < threshold for page in page_rank):
             break
 
-def pr_iterative_algorithm():
+        page_rank = new_rank
 
-    return
+    total_rank = sum(page_rank.values())
+    page_rank = {page: rank / total_rank for page, rank in page_rank.items()}
+
+    return page_rank
 
 if __name__ == "__main__":
     main()
